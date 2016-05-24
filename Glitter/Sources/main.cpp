@@ -80,9 +80,9 @@ int main(int argc, char * argv[]) {
         glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	GLuint textures[2];
+	glGenTextures(2, textures);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -91,6 +91,16 @@ int main(int argc, char * argv[]) {
 		int width, height, n;
 		unsigned char* image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/container.jpg", &width, &height, &n, 0);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(image);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/awesomeface.png", &width, &height, &n, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		stbi_image_free(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -106,7 +116,14 @@ int main(int argc, char * argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.activate();
-		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, textures[0]);
+			glUniform1i(glGetUniformLocation(shader.get(), "ourTexture1"), 0);
+		glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, textures[1]);
+			glUniform1i(glGetUniformLocation(shader.get(), "ourTexture2"), 1);
+
         glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
