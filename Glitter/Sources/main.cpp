@@ -1,5 +1,6 @@
 // Local Headers
 #include "glitter.hpp"
+#include "shader.hpp"
 
 // System Headers
 #include <glad/glad.h>
@@ -8,27 +9,6 @@
 // Standard Headers
 #include <cstdio>
 #include <cstdlib>
-
-// Macros
-#define GLSL(src) "#version 330 core\n" #src
-
-const char* vShaderSrc = GLSL(
-        layout (location = 0) in vec3 position;
-
-        void main()
-        {
-            gl_Position = vec4(position.x, position.y, position.z, 1.0);
-        }
-);
-
-const char* fShaderSrc = GLSL(
-        out vec4 color;
-
-        void main()
-        {
-            color = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-        }
-);
 
 const float vertices[] = {
     -0.5f, -0.5f, 0.0f,
@@ -58,41 +38,10 @@ int main(int argc, char * argv[]) {
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
-    GLuint vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vShaderSrc, NULL);
-    glCompileShader(vertexShader);
-
-    GLint success;
-    GLchar infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if(!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        fprintf(stderr, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
-    }
-
-    GLuint fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fShaderSrc, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if(!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        fprintf(stderr, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-    }
-
-    GLuint shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        fprintf(stderr, "ERROR::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
-    }
+    Shader shader;
+    shader.attach("triangle.vert")
+          .attach("triangle.frag")
+          .link();
 
     GLuint VBO;
     glGenBuffers(1, &VBO);
@@ -116,7 +65,7 @@ int main(int argc, char * argv[]) {
         glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shader.activate();
 
         glBindVertexArray(VAO);
             glDrawArrays(GL_TRIANGLES, 0, 3);
