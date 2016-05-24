@@ -21,8 +21,8 @@ const GLfloat vertices[] = {
 };
 
 const GLuint indices[] = {  // Note that we start from 0!
-	0, 1, 3, // First Triangle
-	1, 2, 3  // Second Triangle
+        0, 1, 3, // First Triangle
+        1, 2, 3  // Second Triangle
 };
 
 const GLfloat texCoords[] = {
@@ -30,6 +30,8 @@ const GLfloat texCoords[] = {
     1.0f, 0.0f,
     0.5f, 1.0f
 };
+
+GLfloat mixValue = 0.2f;
 
 void key_callback(GLFWwindow* mWindow, int key, int scancode, int action, int mode);
 
@@ -54,7 +56,7 @@ int main(int argc, char * argv[]) {
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
-	glfwSetKeyCallback(mWindow, key_callback);
+        glfwSetKeyCallback(mWindow, key_callback);
 
     Shader shader;
     shader.attach("triangle.vert")
@@ -73,41 +75,41 @@ int main(int argc, char * argv[]) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		// position
+                // position
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
-		// color
+                // color
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
-		// texCoord
+                // texCoord
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
         glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
-	GLuint textures[2];
-	glGenTextures(2, textures);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLuint textures[2];
+        glGenTextures(2, textures);
+        glBindTexture(GL_TEXTURE_2D, textures[0]);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // Set texture wrapping to GL_REPEAT (usually basic wrapping method)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		int width, height, n;
-		unsigned char* image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/container.jpg", &width, &height, &n, 0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(image);
-	glBindTexture(GL_TEXTURE_2D, textures[1]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                int width, height, n;
+                unsigned char* image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/container.jpg", &width, &height, &n, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+                glGenerateMipmap(GL_TEXTURE_2D);
+                stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // Set texture wrapping to GL_REPEAT (usually basic wrapping method)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/awesomeface.png", &width, &height, &n, 0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
+                image = stbi_load(PROJECT_SOURCE_DIR "/assets/textures/awesomeface.png", &width, &height, &n, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+                glGenerateMipmap(GL_TEXTURE_2D);
+                stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
 
     // Rendering Loop
@@ -118,12 +120,14 @@ int main(int argc, char * argv[]) {
 
         shader.activate();
 
-		glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, textures[0]);
-			glUniform1i(glGetUniformLocation(shader.get(), "ourTexture1"), 0);
-		glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, textures[1]);
-			glUniform1i(glGetUniformLocation(shader.get(), "ourTexture2"), 1);
+        glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, textures[0]);
+            glUniform1i(glGetUniformLocation(shader.get(), "ourTexture1"), 0);
+        glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, textures[1]);
+            glUniform1i(glGetUniformLocation(shader.get(), "ourTexture2"), 1);
+
+        glUniform1f(glGetUniformLocation(shader.get(), "mixValue"), mixValue);
 
         glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -137,6 +141,16 @@ int main(int argc, char * argv[]) {
 }
 
 void key_callback(GLFWwindow* mWindow, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(mWindow, true);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(mWindow, true);
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        mixValue += 0.1f;
+        if (mixValue >= 1.0f)
+            mixValue = 1.0f;
+    }
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        mixValue -= 0.1f;
+        if (mixValue <= 0.0f)
+            mixValue = 0.0f;
+    }
 }
