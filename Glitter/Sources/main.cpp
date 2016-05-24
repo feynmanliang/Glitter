@@ -31,6 +31,8 @@ const GLfloat texCoords[] = {
     0.5f, 1.0f
 };
 
+void key_callback(GLFWwindow* mWindow, int key, int scancode, int action, int mode);
+
 int main(int argc, char * argv[]) {
     // Load GLFW and Create a Window
     glfwInit();
@@ -51,6 +53,8 @@ int main(int argc, char * argv[]) {
     glfwMakeContextCurrent(mWindow);
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+
+	glfwSetKeyCallback(mWindow, key_callback);
 
     Shader shader;
     shader.attach("triangle.vert")
@@ -108,9 +112,6 @@ int main(int argc, char * argv[]) {
 
     // Rendering Loop
     while (glfwWindowShouldClose(mWindow) == false) {
-        if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(mWindow, true);
-
         // Background Fill Color
         glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -133,4 +134,9 @@ int main(int argc, char * argv[]) {
         glfwPollEvents();
     }   glfwTerminate();
     return EXIT_SUCCESS;
+}
+
+void key_callback(GLFWwindow* mWindow, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(mWindow, true);
 }
